@@ -1,49 +1,42 @@
-const asyncHandler = require("express-async-handler");
-const User = require('../models/userModel')
-const generateToken = require('../config/generateToken')
-
+const asyncHandler = require('express-async-handler');
+const User = require('../models/userModel');
+const generateToken = require('../config/generateToken');
 
 // code for sign up or registration
 const registerUser = asyncHandler(async (req, res) => {
-    const { name, email, password, pic } = req.body;
+  const { name, email, password, pic } = req.body;
 
-    if (!name || !email || !password) {
-        resizeBy.status(400);
-        throw new Error("Please Enter all the Fields");
-    }
+  if (!name || !email || !password) {
+    resizeBy.status(400);
+    throw new Error('Please Enter all the Fields');
+  }
 
-    const userExists = await User.findOne({ email });
-    
-    if (userExists) {
-        res.status(400);
-        throw new Error("User already exists!")
-    }
+  const userExists = await User.findOne({ email });
 
-    const user = await User.create(
-        {
-            name,
-            email,
-            password,
-            pic,
-           
-        }
-    )
+  if (userExists) {
+    res.status(400);
+    throw new Error('User already exists!');
+  }
 
-    if (user) {
-        res.status(201).json(
-            {
-                _id: user._id,
-                name: user.name,
-                email: user.email,
-                pic: user.pic,
-                token: generateToken(user._id),
-            }
-        )
-    } else {
-        res.status(400);
-        throw new Error("Failed to Create the User please try again!")
-    }
+  const user = await User.create({
+    name,
+    email,
+    password,
+    pic,
+  });
 
+  if (user) {
+    res.status(201).json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      pic: user.pic,
+      token: generateToken(user._id),
+    });
+  } else {
+    res.status(400);
+    throw new Error('Failed to Create the User please try again!');
+  }
 });
 
 const authUser = asyncHandler(async (req, res) => {
@@ -61,9 +54,24 @@ const authUser = asyncHandler(async (req, res) => {
     });
   } else {
     res.status(401);
-    throw new Error("Invalid Email or Password");
+    throw new Error('Invalid Email or Password');
   }
 });
 
+// search user
+// /api/user?search=leon
+const allUsers = asyncHandler(async (req, res) => {
+  const keyword = req.query.search
+    ? {
+        $or: [
+          { name: { $regex: req.query.search, $options: 'i' } },
+          { email: { $regex: req.query.search, $options: 'i' } },
+        ],
+      }
+    : {};
 
-module.exports = {registerUser, authUser}
+  const users = await User.find(keyword).find({ _id: { $ne: req.user._id } });
+  res.send(users);
+});
+
+module.exports = { registerUser, authUser, allUsers };
