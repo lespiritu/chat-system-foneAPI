@@ -10,6 +10,7 @@ const PORT = process.env.PORT || 5000;
 
 // routes
 const userRoutes = require('./routes/userRoutes');
+const chatRoutes = require('./routes/chatRouters');
 connectDB();
 
 //middleware
@@ -23,6 +24,7 @@ app.get('/', (req, res) => {
 
 // request routes
 app.use('/api/user', userRoutes);
+app.use('/api/chat', chatRoutes);
 
 //error handler
 app.use(notFound);
