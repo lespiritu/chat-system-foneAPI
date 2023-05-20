@@ -1,6 +1,7 @@
 const express = require('express');
 const connectDB = require('./config/db');
 const dotenv = require('dotenv');
+
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
 
 dotenv.config();
@@ -17,7 +18,6 @@ connectDB();
 //middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-// app.use(cors());
 
 app.get('/', (req, res) => {
   res.send('API is Running');
@@ -46,6 +46,7 @@ io.on('connection', (socket) => {
   console.log('Connected to socket.io');
   socket.on('setup', (userData) => {
     socket.join(userData._id);
+    console.log(userData._id);
     socket.emit('connected');
   });
 
@@ -53,8 +54,6 @@ io.on('connection', (socket) => {
     socket.join(room);
     console.log('User Joined Room: ' + room);
   });
-  socket.on('typing', (room) => socket.in(room).emit('typing'));
-  socket.on('stop typing', (room) => socket.in(room).emit('stop typing'));
 
   socket.on('new message', (newMessageRecieved) => {
     var chat = newMessageRecieved.chat;
@@ -68,6 +67,11 @@ io.on('connection', (socket) => {
     });
   });
 
+  // socket for typing
+  socket.on('typing', (room) => socket.in(room).emit('typing'));
+  socket.on('stop typing', (room) => socket.in(room).emit('stop typing'));
+
+  // socket for disconnected
   socket.off('setup', () => {
     console.log('USER DISCONNECTED');
     socket.leave(userData._id);
