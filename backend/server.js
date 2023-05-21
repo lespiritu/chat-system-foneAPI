@@ -3,7 +3,7 @@ const connectDB = require('./config/db');
 const dotenv = require('dotenv');
 const path = require('path');
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
-const cors = require('cors');
+// const cors = require('cors');
 
 dotenv.config();
 
@@ -19,11 +19,11 @@ connectDB();
 //middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+// app.use(cors());
 
-app.get('/', (req, res) => {
-  res.send('API is Running');
-});
+// app.get('/', (req, res) => {
+//   res.send('API is Running');
+// });
 
 // request routes
 app.use('/api/user', userRoutes);
