@@ -50,7 +50,7 @@ const server = app.listen(PORT, console.log(`Server is running at port ${PORT}`)
 const io = require('socket.io')(server, {
   pingTimeout: 60000,
   cors: {
-    origin: 'https://chat-foneapi-101-cm6e.vercel.app',
+    origin: 'http://localhost:3000',
     // credentials: true,
   },
 });
